@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <libgen.h>
 
 struct State {
     char *word;
@@ -47,15 +48,19 @@ int evalGameProgress(State *state) {
     return 1;
 }
 
-char *getRandomWord() {
+char *getRandomWord(char *path) {
     FILE *fp;
     char *line;
+
+    char buff[255];
+    char *wordpath = dirname(realpath(path, buff));
+    strcat(wordpath, "/google-10000-english.txt");
 
     // Generate a random number between 1 and 10000 (10000 words in file)
     srand(time(0));
     int n = (int) rand() % 10000;
 
-    fp = fopen("./google-10000-english.txt", "r");
+    fp = fopen(wordpath, "r");
     char *s = malloc(sizeof(char) * 255);
 
     int i = 0;
@@ -97,10 +102,10 @@ void guessLetter(char letter, State *state) {
     }
 }
 
-int main() {
+int main(int argc, char **argv) {
     printf("Welcome to hangman!\n\n");
 
-    char *word = getRandomWord();
+    char *word = getRandomWord(argv[0]);
 
     State *state = malloc(sizeof(State));
     state->word = word;
